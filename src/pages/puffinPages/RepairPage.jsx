@@ -50,7 +50,7 @@ export const RepairPage = () => {
         donorid: {
             label: "Donor Id",
             flag: "--donorid",
-            type: "number",
+            type: "text",
             required: true,
             altFlags : [],
         }, 
