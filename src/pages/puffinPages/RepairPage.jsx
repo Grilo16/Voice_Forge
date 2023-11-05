@@ -53,8 +53,8 @@ export const RepairPage = () => {
             type: "text",
             required: false,
             altFlags : [{
-                label: "donorrvb",
-                flag: "--donorrvb",
+                label: "donorvb",
+                flag: "--donorvb",
                 type: "checkbox",
                 required: false,
             },],
