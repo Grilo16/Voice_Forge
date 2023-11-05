@@ -42,7 +42,7 @@ export const RepairPage = () => {
         }, 
         prepoc: {
             label: "Preprocessing",
-            flag: "--prepoc",
+            flag: "--preproc",
             type: "text",
             required: false,
             altFlags : [],
