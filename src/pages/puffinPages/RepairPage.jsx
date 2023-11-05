@@ -14,7 +14,7 @@ export const RepairPage = () => {
         }, 
         d: {
             label: "Date (YYYY-WW)",
-            flag: "--d",
+            flag: "-d",
             type: "text",
             required: true,
             altFlags : [],
@@ -23,13 +23,6 @@ export const RepairPage = () => {
             label: "Starting Version",
             flag: "-n",
             type: "text",
-            required: true,
-            altFlags : [],
-        }, 
-        donorid: {
-            label: "Donor Id",
-            flag: "--donorid",
-            type: "number",
             required: true,
             altFlags : [],
         }, 
@@ -47,11 +40,11 @@ export const RepairPage = () => {
             required: false,
             altFlags : [],
         }, 
-        donorprepoc: {
-            label: "Donor Preprocessing",
-            flag: "--donorprepoc",
-            type: "text",
-            required: false,
+        donorid: {
+            label: "Donor Id",
+            flag: "--donorid",
+            type: "number",
+            required: true,
             altFlags : [],
         }, 
         donordate: {
@@ -66,6 +59,13 @@ export const RepairPage = () => {
                 required: false,
             },],
         }, 
+        donorprepoc: {
+            label: "Donor Preprocessing",
+            flag: "--donorprepoc",
+            type: "select",// will be dropdown
+            required: false,
+            altFlags : [],
+        }, 
     }
     
     const [outputObj, setOutputObj] = useState({})
@@ -77,8 +77,10 @@ export const RepairPage = () => {
         return !value ? acc + " " : acc + flag + value}, "python3 ~/spun/repos/speedy/script/run.py ")
         
         return (
-            
             <TaskSelectorDiv> 
+            {/* <select>
+                <option> something </option>
+            </select> */}
                 <OutputDiv>
                     <h1>Forged Command : </h1>
                     <h2> {newOutput} </h2>
