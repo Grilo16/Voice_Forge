@@ -81,7 +81,7 @@ export const RepairPage = () => {
     const newOutput = Object.entries(outputObj).reduce((acc, curr)=>  {
         const flag = curr.at(1).value.length > 1 ? curr.at(1).flag : ""
         const value = curr.at(1).type === "week" ? curr.at(1).value.replace("W", "") :curr.at(1).value
-        return !value ? acc + " " : acc + flag + value}, "python run.py ")
+        return !value ? acc + " " : acc + flag + value}, "python3 ~/spun/repos/speedy/script/run.py ")
         
         return (
             
