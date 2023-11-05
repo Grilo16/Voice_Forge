@@ -11,6 +11,12 @@ mod flag;
 use flag::Flag;
 
 
+#[path = "ssh_session/session_handler.rs"]
+mod session_handler;
+
+use session_handler::{create_session, execute_command};
+
+
 use std::{env, path::{Path, self}};
 use serde::Serialize;
 
@@ -112,7 +118,7 @@ fn insert_data(query: i64) -> String {
         input_type: "test".to_string(),
         required: false
     };
-    
+
     let data = create_flag(flag_instance);
     // get_flag(query);
     
@@ -155,11 +161,22 @@ fn get_cwd() -> String {
     format!("Cwd is :  {:?}", path)
 }
 
+#[tauri::command]
+fn connect_ssh(comand: String ) -> String {
+    let mut sess = create_session();
+    let output4 = execute_command(&mut sess, &comand);
+
+    output4
+
+}
+
+
+
 fn main() {
     let _ = initialize_db();
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_cwd, connect_to_db, create_tables, insert_data])
+        .invoke_handler(tauri::generate_handler![get_cwd, connect_to_db, create_tables, insert_data, connect_ssh])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
