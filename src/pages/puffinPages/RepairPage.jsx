@@ -68,7 +68,7 @@ export const RepairPage = () => {
         }, 
         donorprepoc: {
             label: "Donor Preprocessing",
-            flag: "--donorprepoc",
+            flag: "--donorpreproc",
             type: "select",// will be dropdown
             required: false,
             altFlags : [],
