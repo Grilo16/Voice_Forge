@@ -8,13 +8,14 @@ export const BuildPage = () => {
     const [createTableOutput, setCreateTableOutput] = useState("")
     const [insertOutput, setInsertOutput] = useState("")
     const [ssh, setSsh] = useState("")
+    const [justDoIt, setJustDoIt] = useState("")
 
     const callRust = async () => {
         setRustOutput(await invoke("connect_to_db"))
         console.log("called")
     }
 
-    let comand  = {comand: "ls"}
+    let comand  = {comand: "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry "}
     let query = {query: 2}
     // let query = {query: "select * from flags"}
     // let query2 = {query: "insert into flags (label, flag, input_type, required) values ('test', 'test', 'test', 0)"}
@@ -28,6 +29,10 @@ export const BuildPage = () => {
         setSsh(await invoke("connect_ssh", comand) )
     }
 
+    const justDoItPlz = async () => {
+        setJustDoIt(await invoke("just_do_it"))
+    }
+
     return (
         <>
         <h1>i'm the Build Page</h1>
@@ -35,6 +40,10 @@ export const BuildPage = () => {
         {createTableOutput}
         <button onClick={() => callInsert()}>insert</button>
         <button onClick={() => connectSsh()}>connect ssh</button>
+        <button onClick={() => justDoItPlz()}>just do it</button>
+        <h1>
+            {justDoIt}
+            </h1>
         {insertOutput}
         <p>this is ssh : {ssh}</p>
         {rustOutput}
