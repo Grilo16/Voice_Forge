@@ -28,6 +28,9 @@ use database::{initialize_db, run_sql};
 use flag_repo::{get_flag, create_flag};
 use rusqlite::{Connection, Result, params};
 
+// this is ssh : Command output: Retrieving security groups based on your IP address... Launching a on_demand g4dn.xlarge instance with AMI: test_WEB-312 Launched instance i-08bde2c2523254caa Wait until the instance is running... Instance is running! Tagging resources... Finding the public DNS... Public DNS: ec2-35-178-172-93.eu-west-2.compute.amazonaws.com Now trying to ssh into machine... Finish your session by exiting and terminating from AWS console ssh -i /Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt ubuntu@ec2-35-178-172-93.eu-west-2.compute.amazonaws.com # Running on MacOs - the above command has also been copied to clipboard Waiting for status being ok (but you can try ssh-ing already!)... Instance status OK!
+
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 // fn test() -> std::io::Result<()> {
 //     let path = env::current_dir()?;
@@ -167,21 +170,24 @@ fn get_cwd() -> String {
 
 #[tauri::command]
 fn connect_ssh(comand: String ) -> String {
-    // let mut sess = create_session();
-    // // let output4 = execute_command(&mut sess, &comand);
+    let sess_result = create_session();
 
-    //     match sess {
-    //         Ok(sess) => format!("{} Connected", sess.authenticated()),
-    //         Err(err) => format!("{} failed to athenticate", err ) 
-    //     }
-    
-    // output4
+    let output4 = match sess_result {
+        Ok(mut sess) => {
+            // Now that we have a Session, we can execute the command
+            execute_command(&mut sess, &comand);
+            format!("{} Connected", sess.authenticated())
+        }
+        Err(err) => format!("{} failed to authenticate", err)
+    };
+
+    output4
 
 
-    match send_terminal_command() {
-        Ok(result) => format!("Command output: {}", result),
-        Err(error) => format!("Error: {}", error),
-    }
+    // match send_terminal_command() {
+    //     Ok(result) => format!("Command output: {}", result),
+    //     Err(error) => format!("Error: {}", error),
+    // }
 
 
 }
