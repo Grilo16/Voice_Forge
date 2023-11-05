@@ -267,7 +267,7 @@ fn just_do_it() -> String {
             println!("we're here {} {} username and host", username, host);
           // Create an SSH session and execute a command
           let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
-          let sess_result = create_session(host.to_string()); // Replace 'host' with the actual host
+          let sess_result = create_session(&host.to_string()); // Replace 'host' with the actual host
           let output4 = match sess_result {
               Ok(mut sess) => {
                   // Now that we have a Session, we can execute the command
