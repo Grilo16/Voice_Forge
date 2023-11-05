@@ -14,6 +14,7 @@ pub fn create_session(host_param: String) -> Result<Session, Error> {
     // let password = "B0oPkkemMakjDA";
     // ec2-35-178-172-93.eu-west-2.compute.amazonaws.com
     let host = format!("{}:22", host_param).to_string();
+    println!("{}", host);
     let username = "ubuntu";
     let password = "B0oPkkemMakjDA";
 
