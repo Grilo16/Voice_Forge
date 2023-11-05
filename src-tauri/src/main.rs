@@ -164,9 +164,13 @@ fn get_cwd() -> String {
 #[tauri::command]
 fn connect_ssh(comand: String ) -> String {
     let mut sess = create_session();
-    let output4 = execute_command(&mut sess, &comand);
+    // let output4 = execute_command(&mut sess, &comand);
 
-    output4
+        match sess {
+            Ok(sess) => format!("{} Connected", sess.authenticated()),
+            Err(err) => format!("{} failed to athenticate", err ) 
+        }
+    // output4
 
 }
 

@@ -1,4 +1,4 @@
-use std::{net::TcpStream, path:: Path};
+use std::{net::TcpStream, path:: Path, io::Error};
 
 use ssh2::{Session};
 
@@ -6,31 +6,27 @@ use std::io::Read;
 
  
 
-pub fn create_session() -> Session {
+pub fn create_session() -> Result<Session, Error> {
+
+    
+    // let host = "127.0.0.1:2222";
+    // let username = "grilo16";
+    // let password = "B0oPkkemMakjDA";
 
     let host = "ec2-3-11-80-53.eu-west-2.compute.amazonaws.com:22";
-
     let username = "ubuntu";
-
     let password = "B0oPkkemMakjDA";
 
-    // ssh -i /Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt   
-
- 
-
-    let tcp = TcpStream::connect(host).unwrap();
-
-    let mut sess = Session::new().unwrap();
-
+    let tcp = TcpStream::connect(host)?;
+    let mut sess = Session::new()?;
     sess.set_tcp_stream(tcp);
-
-    sess.handshake().unwrap();
-
-    sess.userauth_pubkey_file(username, None, Path::new("/Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt"), None).unwrap();
-
+    sess.handshake()?;
+    // sess.userauth_pubkey_file(username, None, Path::new("c:\\") , None )?;
+    sess.userauth_pubkey_file(username, None, Path::new("/Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt"), None)?;
     assert!(sess.authenticated());
     println!("Authenticated: {}", sess.authenticated());
-    sess
+    Ok(sess)
+
 }
 
 
