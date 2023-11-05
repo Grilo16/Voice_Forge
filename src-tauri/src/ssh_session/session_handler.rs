@@ -6,14 +6,14 @@ use std::io::Read;
 
  
 
-pub fn create_session(host: String) -> Result<Session, Error> {
+pub fn create_session(host_param: String) -> Result<Session, Error> {
 
     
     // let host = "127.0.0.1:2222";
     // let username = "grilo16";
     // let password = "B0oPkkemMakjDA";
     // ec2-35-178-172-93.eu-west-2.compute.amazonaws.com
-    let host = format!("{}:22", host).to_string();
+    let host = format!("{}:22", host_param).to_string();
     let username = "ubuntu";
     let password = "B0oPkkemMakjDA";
 

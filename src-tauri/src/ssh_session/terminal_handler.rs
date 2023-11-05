@@ -10,7 +10,7 @@ pub fn send_terminal_command() -> Result<String> {
                 "~/spun/repos/su_cloud_scripts",   
                 ";",                              
                 "python launch.py",             
-                "--machine", "g4dn.xlarge",
+                "--machine", "t2.small",
                 "--product", "TTS_deploy",
                 "--names", "s04vXu0Qv_repair"
             ])
@@ -19,7 +19,7 @@ pub fn send_terminal_command() -> Result<String> {
         Command::new("sh")
         .args(&[
             "-c",
-            "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine g4dn.xlarge --product TTS_deploy --name s04vXu0Qv_repair"
+            "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine t2.small --product TTS_deploy --name s04vXu0Qv_repair"
         ])  
             .output()
     }?;
