@@ -33,6 +33,13 @@ export const RepairPage = () => {
             required: false,
             altFlags : [],
         }, 
+        accent: {
+            label: "Accent",
+            flag: "--accent",
+            type: "text",
+            required: false,
+            altFlags : [],
+        }, 
         prepoc: {
             label: "Preprocessing",
             flag: "--prepoc",
