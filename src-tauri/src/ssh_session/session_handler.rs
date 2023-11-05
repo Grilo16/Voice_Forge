@@ -13,7 +13,7 @@ pub fn create_session(host: String) -> Result<Session, Error> {
     // let username = "grilo16";
     // let password = "B0oPkkemMakjDA";
     // ec2-35-178-172-93.eu-west-2.compute.amazonaws.com
-    let host = format!("{}:22", host);
+    let host = format!("{}:22", host).to_string();
     let username = "ubuntu";
     let password = "B0oPkkemMakjDA";
 
