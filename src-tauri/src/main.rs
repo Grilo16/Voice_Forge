@@ -262,7 +262,7 @@ fn just_do_it() -> String {
         if let Some(matched_string ) = username_and_host {
             let parts: Vec<&str> = matched_string.split("@").collect();
             let username = parts[0];
-            let host = parts[1];
+            let host = parts[1].trim();
             
             println!("we're here {} {} username and host", username, host);
           // Create an SSH session and execute a command
