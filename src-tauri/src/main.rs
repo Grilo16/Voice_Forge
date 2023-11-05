@@ -254,17 +254,17 @@ fn just_do_it() -> String {
          // Assuming send_terminal_command returns a String
       // Retrieve the connection string (replace with your own logic)
       let connection_string = send_terminal_command().unwrap(); // You should handle errors properly.
-
-      // Extract the username and host
-      let re = Regex::new(r"ubuntu@[^ ]+").unwrap();
-      let username_and_host = extract_username_host(&connection_string);
-  
-      // Check if the extraction was successful
-      if let Some(matched_string) = username_and_host {
-          let parts: Vec<&str> = matched_string.split("@").collect();
-          let username = parts[0];
-          let host = parts[1];
-  
+        println!("we're here{}", connection_string);
+        // Extract the username and host
+        let username_and_host = extract_username_host(&connection_string);
+        
+        // Check if the extraction was successful
+        if let Some(matched_string ) = username_and_host {
+            let parts: Vec<&str> = matched_string.split("@").collect();
+            let username = parts[0];
+            let host = parts[1];
+            
+            println!("we're here {} {} username and host", username, host);
           // Create an SSH session and execute a command
           let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
           let sess_result = create_session(host.to_string()); // Replace 'host' with the actual host
@@ -272,11 +272,13 @@ fn just_do_it() -> String {
               Ok(mut sess) => {
                   // Now that we have a Session, we can execute the command
                   execute_command(&mut sess, &command);
+
                   format!("{} Connected", sess.authenticated())
               }
               Err(err) => format!("Failed to authenticate: {}", err),
           };
   
+          println!("{} output 4",output4);
           output4
       } else {
           "Found nothing".to_string()
