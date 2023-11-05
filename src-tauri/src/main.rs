@@ -10,6 +10,10 @@ mod flag_repo;
 mod flag;
 use flag::Flag;
 
+#[path = "ssh_session/terminal_handler.rs"]
+mod terminal_handler;
+use terminal_handler::send_terminal_command;
+
 
 #[path = "ssh_session/session_handler.rs"]
 mod session_handler;
@@ -163,14 +167,22 @@ fn get_cwd() -> String {
 
 #[tauri::command]
 fn connect_ssh(comand: String ) -> String {
-    let mut sess = create_session();
-    // let output4 = execute_command(&mut sess, &comand);
+    // let mut sess = create_session();
+    // // let output4 = execute_command(&mut sess, &comand);
 
-        match sess {
-            Ok(sess) => format!("{} Connected", sess.authenticated()),
-            Err(err) => format!("{} failed to athenticate", err ) 
-        }
+    //     match sess {
+    //         Ok(sess) => format!("{} Connected", sess.authenticated()),
+    //         Err(err) => format!("{} failed to athenticate", err ) 
+    //     }
+    
     // output4
+
+
+    match send_terminal_command() {
+        Ok(result) => format!("Command output: {}", result),
+        Err(error) => format!("Error: {}", error),
+    }
+
 
 }
 
