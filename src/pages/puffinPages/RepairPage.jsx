@@ -6,22 +6,8 @@ export const RepairPage = () => {
     
     const repairArgs = {
         i: {
-            label: "i",
+            label: "Speaker Id",
             flag: "-i",
-            type: "number",
-            required: true,
-            altFlags : [],
-        }, 
-        o: {
-            label: "o",
-            flag: "-o",
-            type: "text",
-            required: true,
-            altFlags : [],
-        }, 
-        n: {
-            label: "n",
-            flag: "-n",
             type: "text",
             required: true,
             altFlags : [],
@@ -30,6 +16,13 @@ export const RepairPage = () => {
             label: "d",
             flag: "--d",
             type: "week",
+            required: true,
+            altFlags : [],
+        }, 
+        n: {
+            label: "n",
+            flag: "-n",
+            type: "text",
             required: true,
             altFlags : [],
         }, 
@@ -97,6 +90,11 @@ export const RepairPage = () => {
                     <button type="submit">Forge </button>
                 </form>
             </TaskSelectorDiv>
+
+
+// Launch => Go to path,
+// open script
+// Paste clipboard
     )
 };
 
