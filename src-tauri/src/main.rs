@@ -3,9 +3,14 @@
 
 #[path = "db/database.rs"]
 mod database;
+use database::Database;
 
 #[path = "db/repositories/flag_repo.rs"]
 mod flag_repo;
+
+#[path = "db/repositories/ssh_cred_repo.rs"]
+mod ssh_cred_repo;
+
 #[path = "./db/models/flag.rs"]
 mod flag;
 use flag::Flag;
@@ -13,13 +18,17 @@ use flag::Flag;
 #[path = "ssh_session/terminal_handler.rs"]
 mod terminal_handler;
 use serde_json::to_string;
-use terminal_handler::send_terminal_command;
+use terminal_handler::run_launch_machine;
 
 
 #[path = "ssh_session/session_handler.rs"]
 mod session_handler;
 
-use session_handler::{create_session, execute_command};
+#[path = "db/models/ssh_credentials.rs"]
+mod ssh_credentials;
+use ssh_credentials::SshCredentials;
+
+use session_handler::SshSession;
 
 
 extern crate regex;
@@ -29,9 +38,10 @@ use regex::Regex;
 use std::{env, path::{Path, self}};
 use serde::Serialize;
 
-use database::{initialize_db, run_sql};
-use flag_repo::{get_flag, create_flag};
+use database::{run_sql};
+use flag_repo::{get_flag, create_flag, FlagsRepo};
 use rusqlite::{Connection, Result, params};
+use ssh_cred_repo::SshCredentialsRepo;
 
 // this is ssh : Command output: Retrieving security groups based on your IP address... Launching a on_demand g4dn.xlarge instance with AMI: test_WEB-312 Launched instance i-08bde2c2523254caa Wait until the instance is running... Instance is running! Tagging resources... Finding the public DNS... Public DNS: ec2-35-178-172-93.eu-west-2.compute.amazonaws.com Now trying to ssh into machine... Finish your session by exiting and terminating from AWS console ssh -i /Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt ubuntu@ec2-35-178-172-93.eu-west-2.compute.amazonaws.com # Running on MacOs - the above command has also been copied to clipboard Waiting for status being ok (but you can try ssh-ing already!)... Instance status OK!
 
@@ -93,26 +103,6 @@ fn connect_to_db() -> String {
         Ok(updated) => format!("{} rows were updated", updated),
         Err(err) => format!("update failed: {}", err),
     }
-}
-
-
-fn create_table(conn: Connection){
-    conn.execute_batch(
-        "BEGIN;
-         CREATE TABLE flags(label TEXT, flag TEXT, type TEXT );
-         COMMIT;",
-    );
-}
-  
-#[tauri::command]
-fn create_tables() -> String {
-    let conn = open_my_db();
-    create_table(conn);
-
-    format!("tables created successfully")
-}
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
 }
 
 
@@ -207,7 +197,7 @@ fn connect_ssh(comand: String ) -> String {
     // }
 
 
-    let text = "this is ssh : Command output: Retrieving security groups based on your IP address... Launching a on_demand g4dn.xlarge instance with AMI: test_WEB-312 Launched instance i-08bde2c2523254caa Wait until the instance is running... Instance is running! Tagging resources... Finding the public DNS... Public DNS: ec2-35-178-172-93.eu-west-2.compute.amazonaws.com Now trying to ssh into machine... Finish your session by exiting and terminating from AWS console ssh -i /Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt ubuntu@ec2-35-178-172-93.eu-west-2.compute.amazonaws.com # Running on MacOs - the above command has also been copied to clipboard Waiting for status being ok (but you can try ssh-ing already!)... Instance status OK!";
+    let text = "this is ssh : Command output: Retrieving security groups based on your IP address... Launching a on_demand g4dn.xlarge instance with AMI: test_WEB-312 Launched instance i-08bde2c2523254caa Wait until the instance is running... Instance is running! Tagging resources... Finding the public DNS... Public DNS: ec2-35-178-172-93.eu-west-2.compute.amazonaws.com Now trying to ssh into machine... Finish your session by exiting and terminating from AWS console ssh -i /Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt ubuntu@ec2-31-478-420-69.eu-west-2.compute.amazonaws.com # Running on MacOs - the above command has also been copied to clipboard Waiting for status being ok (but you can try ssh-ing already!)... Instance status OK!";
 
     let re = Regex::new(r"ubuntu@[^ ]+").unwrap();
 
@@ -251,46 +241,111 @@ fn just_do_it() -> String {
         // output4
 
 
-         // Assuming send_terminal_command returns a String
-      // Retrieve the connection string (replace with your own logic)
-      let connection_string = send_terminal_command().unwrap(); // You should handle errors properly.
-        println!("we're here{}", connection_string);
-        // Extract the username and host
-        let username_and_host = extract_username_host(&connection_string);
-        
-        // Check if the extraction was successful
-        if let Some(matched_string ) = username_and_host {
-            let parts: Vec<&str> = matched_string.split("@").collect();
-            let username = parts[0];
-            let host = parts[1].trim();
-            
-            println!("we're here {} {} username and host", username, host);
-          // Create an SSH session and execute a command
-          let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
-          let sess_result = create_session(&host.to_string()); // Replace 'host' with the actual host
-          let output4 = match sess_result {
-              Ok(mut sess) => {
-                  // Now that we have a Session, we can execute the command
-                  execute_command(&mut sess, &command);
+        let connection_string = run_launch_machine().unwrap();
+        let raw_credentials = extract_username_host(&connection_string);
 
-                  format!("{} Connected", sess.authenticated())
-              }
-              Err(err) => format!("Failed to authenticate: {}", err),
-          };
-  
-          println!("{} output 4",output4);
-          output4
-      } else {
-          "Found nothing".to_string()
-      }
+        if let Some(matched_string) = raw_credentials {
+
+            if let Some(credentials) = SshCredentials::from_ssh_string(&matched_string) {
+
+                let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
+
+                match SshSession::new(&credentials) {
+                    Ok(mut ssh_session) => {
+                        match ssh_session.execute_command(&command) {
+                            Ok(output) => {
+                                format!("Command output: {}", output)
+                            }
+                            Err(err) => {
+                                format!("Error executing SSH command: {}", err)
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        format!("Error creating SSH session: {}", err)
+                    }
+                }
+            } else {
+                format!("Failed to parse SSH credentials")
+            }
+        } else {
+            format!("Found nothing")
+        }
+        }
+
+#[tauri::command]
+fn launch_cloud_client() -> String{
+    // let flag = Flag::new(0, "test again".to_string(), "test flag again".to_string(), "test type input".to_string(), true);
+    // let flagRepo = FlagsRepo::new();
+    // flagRepo.insert_flag(&flag);
+
+    let ssh_cred_repo = SshCredentialsRepo::new();
+
+    // let flags = flagRepo.get_all_flags().unwrap();
+
+    // for flag in flags{
+    //     println!("{}", flag)
+    // }
+
+    match run_launch_machine() {
+        Ok(output) => {
+            if let Some(username_host) = extract_username_host(&output){
+                if let Some(credentials) = SshCredentials::from_ssh_string(&username_host) {
+                    ssh_cred_repo.insert_ssh_credentials(&credentials);
+                    
+                    format!("Username and host :  {}", credentials);
+                    
+                    let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
+
+                    match SshSession::new(&credentials) {
+                        Ok(mut ssh_session) => {
+                            match ssh_session.execute_command(&command) {
+                                Ok(output) => {
+                                    format!("Command output: {}", output)
+                                }
+                                Err(err) => {
+                                    format!("Error executing SSH command: {}", err)
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            format!("Error creating SSH session: {}", err)
+                        }
+                    }
+                }else{
+                    "No username or host found, check run.py".to_string()
+                }
+            }else{
+                "No username or host found, check run.py".to_string()
+            }
+            
+        }
+        Err(err) => {
+            format!("Error : {}", err)
+        }
+    }
 }
 
 
-fn main() {
-    let _ = initialize_db();
 
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_cwd, connect_to_db, create_tables, insert_data, connect_ssh, just_do_it])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+fn main() {
+    if let Ok(db) = Database::open() {
+        if let Err(err) = db.create_tables() {
+            eprintln!("Error creating tables: {:?}", err);
+            return;
+        }
+        tauri::Builder::default()
+            .invoke_handler(tauri::generate_handler![
+                get_cwd, 
+                connect_to_db, 
+                insert_data, 
+                connect_ssh, 
+                just_do_it,
+                launch_cloud_client
+            ])
+            .run(tauri::generate_context!())
+            .expect("Error while running Tauri application");
+    } else {
+        eprintln!("Error opening the database");
+    }
 }

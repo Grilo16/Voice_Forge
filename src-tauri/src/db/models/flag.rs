@@ -1,4 +1,6 @@
-use rusqlite::{types::{FromSql, ValueRef, FromSqlError}, Error};
+use core::fmt;
+
+use rusqlite::{types::{FromSql, ValueRef, FromSqlError}};
 use serde::Serialize;
 
 
@@ -22,6 +24,16 @@ impl Flag {
             input_type,
             required,
         }
+    }
+}
+
+impl fmt::Display for Flag {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "id: {}, label: {}, flag: {}, input_type: {}, required: {}",
+            self.id, self.label, self.flag, self.input_type, self.required
+        )
     }
 }
 
