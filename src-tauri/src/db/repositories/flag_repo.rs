@@ -1,4 +1,4 @@
-use crate::Flag;
+use crate::TerminalFlag;
 use crate::Database;
 use rusqlite::{Connection, Result, Error, params};
 
@@ -13,7 +13,7 @@ impl FlagsRepo {
         Self { conn: db.get_connection() }
     }
     
-    pub fn insert_flag(&self, flag: &Flag) -> Result<(), Error> {
+    pub fn insert_flag(&self, flag: &TerminalFlag) -> Result<(), Error> {
         self.conn.execute(
             "INSERT INTO flags (label, flag, input_type, required)
             VALUES (?1, ?2, ?3, ?4)",
@@ -21,7 +21,7 @@ impl FlagsRepo {
         )?;
         Ok(())
     }
-    pub fn get_flag(&self, id: String) -> Result<Option<Flag>, Error> {
+    pub fn get_flag(&self, id: String) -> Result<Option<TerminalFlag>, Error> {
         let parsed_id = id.parse::<i64>().map_err(|e| {
             eprintln!("Failed to parse flag ID as i64: {}", e);
             rusqlite::Error::QueryReturnedNoRows
@@ -29,7 +29,7 @@ impl FlagsRepo {
     
         let mut stmt = self.conn.prepare("SELECT * FROM flags WHERE id = ?1")?;
         let flag = stmt.query_row(params![parsed_id], |row| {
-            Ok(Flag {
+            Ok(TerminalFlag {
                 id: row.get(0)?,
                 label: row.get(1)?,
                 flag: row.get(2)?,
@@ -45,10 +45,10 @@ impl FlagsRepo {
         }
     }
 
-    pub fn get_all_flags(&self) -> Result<Vec<Flag>, Error> {
+    pub fn get_all_flags(&self) -> Result<Vec<TerminalFlag>, Error> {
         let mut stmt = self.conn.prepare("SELECT * FROM flags")?;
         let flags_iter = stmt.query_map([], |row| {
-            Ok(Flag {
+            Ok(TerminalFlag {
                 id: row.get(0)?,
                 label: row.get(1)?,
                 flag: row.get(2)?,
@@ -73,7 +73,7 @@ impl FlagsRepo {
         Ok(flags)
     }
 
-    pub fn update_flag(&self, flag: &Flag) -> Result<(), Error> {
+    pub fn update_flag(&self, flag: &TerminalFlag) -> Result<(), Error> {
         self.conn.execute(
             "UPDATE flags
              SET label = ?2, flag = ?3, input_type = ?4, required = ?5

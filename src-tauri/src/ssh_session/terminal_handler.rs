@@ -37,34 +37,57 @@ fn run_command(command: &str, args: &[&str]) -> Result<Output, LaunchError>{
     }
 }
 
-fn launch_machine_command() -> Result<Output, LaunchError>{
+fn launch_machine_command(launch_flags: String) -> Result<Output, LaunchError>{
     if cfg!(target_os = "windows") {
-        run_command(
-            "powershell",
-            &[
-                "cd",
-                "~/spun/repos/su_cloud_scripts",
-                ";",
-                "python",
-                "launch.py",
-                "--machine",
-                "t2.small",
-                "--product",
-                "TTS_deploy",
-                "--names",
-                "s04vXu0Qv_repair",
-            ],
-        )
+        let mut windows_args = vec![
+            "cd",
+            "~/spun/repos/su_cloud_scripts",
+            ";",
+            "python",
+            "launch.py",
+            ]; 
+
+            let windows_flags: Vec<&str> = launch_flags.split(" ").collect();
+            windows_args.extend(windows_flags.iter().cloned());
+            run_command("powershell", &windows_args)
     } else {
-        run_command(
-            "sh",
-            &[
-                "-c",
-                "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine t2.small --product TTS_deploy --name s04vXu0Qv_repair",
-            ],
-        )
+        let mut mac_args = vec![
+            "-c"
+        ];
+        let mut mac_flags = "cd ~/spun/repos/su_cloud_scripts && python3 launch.py".to_string();
+        mac_flags.push_str(&launch_flags);
+        mac_args.push(&mac_flags);
+        run_command("sh",&mac_args)
     }
 }
+// fn launch_machine_command() -> Result<Output, LaunchError>{
+//     if cfg!(target_os = "windows") {
+//         run_command(
+//             "powershell",
+//             &[
+//                 "cd",
+//                 "~/spun/repos/su_cloud_scripts",
+//                 ";",
+//                 "python",
+//                 "launch.py",
+//                 "--machine",
+//                 "t2.small",
+//                 "--product",
+//                 "TTS_deploy",
+//                 "--names",
+//                 "s04vXu0Qv_repair",
+//             ],
+//         )
+//     } else {
+//         run_command(
+//             "sh",
+//             &[
+//                 "-c",
+//                 "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine t2.small --product TTS_deploy --name s04vXu0Qv_repair",
+//             ],
+//         )
+//     }
+// }
 
 
 fn extract_username_host(text: &str) -> Result<&str, Box<dyn Error>> {
@@ -78,8 +101,8 @@ fn extract_username_host(text: &str) -> Result<&str, Box<dyn Error>> {
 }
 
 
-pub fn run_launch_machine() -> Result<SshCredentials, Box<dyn Error>> {
-    let result = match launch_machine_command() {
+pub fn run_launch_machine(launch_flags: String) -> Result<SshCredentials, Box<dyn Error>> {
+    let result = match launch_machine_command(launch_flags) {
         Ok(output) => {
             String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?
         }
@@ -88,8 +111,9 @@ pub fn run_launch_machine() -> Result<SshCredentials, Box<dyn Error>> {
             return Err(Box::new(err));
         }
     };
-    let username_host = extract_username_host(&result)?;
     
+    let username_host = extract_username_host(&result)?;
+
     match SshCredentials::from_ssh_string(&username_host) {
         Some(credentials) => {
             let ssh_cred_repo = SshCredentialsRepo::new();
