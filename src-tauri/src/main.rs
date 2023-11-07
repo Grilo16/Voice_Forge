@@ -27,39 +27,28 @@ use flag::Flag;
 // use flag_repo::FlagsRepo;
 
 use ssh_credentials::SshCredentials;
-use ssh_cred_repo::SshCredentialsRepo;
 
 
 // 0Sh1g0t0! jays pc pass
 #[tauri::command]
 fn launch_cloud_client() -> String{
     
-    let ssh_cred_repo = SshCredentialsRepo::new();
-
-    let output = match run_launch_machine() {
+    let ssh_credentials = match run_launch_machine() {
         Ok(output) => output,
         Err(err) => return format!("Error: {}", err),
     };
-
-    let credentials = match SshCredentials::from_ssh_string(&output) {
-        Some(credentials) => credentials,
-        None => return "No username or host found, check run.py".to_string(),
-    };
-
-    let _ = ssh_cred_repo.insert_ssh_credentials(&credentials);
-
-    let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
-
-    let mut ssh_session = match SshSession::new(&credentials) {
+    
+    let mut ssh_session = match SshSession::new(&ssh_credentials) {
         Ok(ssh_session) => ssh_session,
         Err(err) => return format!("Error creating SSH session: {}", err),
     };
 
+    let command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
+    
     match ssh_session.execute_command(&command) {
         Ok(output) => format!("Command output: {}", output),
         Err(err) => format!("Error executing SSH command: {}", err),
     }
-    
 }
 
 

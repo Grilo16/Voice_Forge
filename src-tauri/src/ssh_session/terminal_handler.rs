@@ -4,6 +4,9 @@ use std::error::Error;
 
 use regex::Regex;
 
+use crate::ssh_cred_repo::SshCredentialsRepo;
+use crate::ssh_credentials::SshCredentials;
+
 
 #[derive(Debug)]
 enum LaunchError {
@@ -21,22 +24,6 @@ impl std::fmt::Display for LaunchError {
 }
 
 impl Error for LaunchError {}
-
-// #[derive(Debug)]
-// enum ConversionError{
-//     Utf8Error(std::string::FromUtf8Error),
-// }
-
-// impl fmt::Display for ConversionError {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self {
-//             ConversionError::Utf8Error(err) => write!(f, "UTF-8 conversion error: {}", err)
-//         }
-//     }
-// }
-
-// impl Error for ConversionError {}
-
 
 fn run_command(command: &str, args: &[&str]) -> Result<Output, LaunchError>{
     let output = Command::new(command).args(args).output().map_err(|e| {
@@ -80,17 +67,18 @@ fn launch_machine_command() -> Result<Output, LaunchError>{
 }
 
 
-fn extract_username_host(text: &str) -> Result<String, Box<dyn Error>> {
+fn extract_username_host(text: &str) -> Result<&str, Box<dyn Error>> {
     let re = Regex::new(r"ubuntu@[^ ]+").map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
     if let Some(cap) = re.find(text) {
-        Ok(cap.as_str().to_string())
+        Ok(cap.as_str())
     } else {
         Err("Pattern not found in text".into())
     }
 }
 
-pub fn run_launch_machine() -> Result<String, Box<dyn Error>> {
+
+pub fn run_launch_machine() -> Result<SshCredentials, Box<dyn Error>> {
     let result = match launch_machine_command() {
         Ok(output) => {
             String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?
@@ -100,7 +88,17 @@ pub fn run_launch_machine() -> Result<String, Box<dyn Error>> {
             return Err(Box::new(err));
         }
     };
-
-    extract_username_host(&result)
+    let username_host = extract_username_host(&result)?;
+    
+    match SshCredentials::from_ssh_string(&username_host) {
+        Some(credentials) => {
+            let ssh_cred_repo = SshCredentialsRepo::new();
+            let _ = ssh_cred_repo.insert_ssh_credentials(&credentials);
+            
+            Ok(credentials)
+        }
+        None => Err(Box::new(LaunchError::ConversionError("No username or host found, check run.py".into())))
+    }
+    
 }
 
