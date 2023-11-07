@@ -21,8 +21,8 @@ const machineReducer = createSlice({
 
         setCredentials: (state, action) => {
             state.sshCredentials.id = action.payload?.id
-            state.sshCredentials.username = action.payload?.host
-            state.sshCredentials.host = action.payload?.username
+            state.sshCredentials.username = action.payload?.username
+            state.sshCredentials.host = action.payload?.host
             state.sshCredentials.ssh_command = action.payload?.ssh_command
         }
 
