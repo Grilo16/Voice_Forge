@@ -1,56 +1,11 @@
-
-// use ssh2::{Session};
-
-// use std::io::Read;
-
-// use crate::ssh_credentials::SshCredentials;
-
- 
-
-// pub fn create_session(credentials: &SshCredentials) -> Result<Session, Error> {
-//     let host = format!("{}:22", credentials.host);
-//     let username = format!("{}", credentials.username);
-
-//     let tcp = TcpStream::connect(host)?;
-//     let mut sess = Session::new()?;
-//     sess.set_tcp_stream(tcp);
-//     sess.handshake()?;
-//     sess.userauth_pubkey_file(&username, None, Path::new("/Users/jemimagoodall/.aws_ssh/jemima_aws23.pem.txt"), None)?;
-//     assert!(sess.authenticated());
-//     println!("Authenticated: {}", sess.authenticated());
-//     Ok(sess)
-// }
-
-
-// pub fn execute_command(sess: &mut ssh2::Session, command: &str) -> String {
-
-//     println!("Command: {}", command);
-
-//     let mut channel = sess.channel_session().unwrap();
-
-//     channel.exec(command).unwrap();
-
-//     let mut s = String::new();
-
-//     channel.send_eof();
-
-//     channel.wait_close();
-
-//     channel.read_to_string(&mut s).unwrap();
-
-//     println!("output: {}", s);
-
-//     s
-
 use std::io::Read;
-// }use std::io::Read;
 use std::net::TcpStream;
 use std::path::Path;
-use ssh2::{Session, Channel, DisconnectCode};
+use ssh2::{Session, DisconnectCode};
 use std::fmt;
 use std::error::Error;
-
 use crate::ssh_credentials::SshCredentials;
+
 
 #[derive(Debug)]
 pub enum SshError {
@@ -156,6 +111,3 @@ impl Drop for SshSession {
     }
 }
 
-pub fn create_ssh_session(credentials: &SshCredentials) -> Result<SshSession, SshError> {
-    SshSession::new(credentials)
-}

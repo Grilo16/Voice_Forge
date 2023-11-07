@@ -18,8 +18,6 @@ mod session_handler;
 mod ssh_credentials;
 
 
-extern crate regex;
-use regex::Regex;
 
 use database::Database;
 use terminal_handler::run_launch_machine;
@@ -31,26 +29,6 @@ use flag_repo::{FlagsRepo};
 use ssh_credentials::SshCredentials;
 use ssh_cred_repo::SshCredentialsRepo;
 
-use std::{env, path::{Path, self}};
-use rusqlite::{Connection};
-use serde::Serialize;
-
-
-#[derive(Debug, Serialize)]
-struct ErrorResponse {
-    message: String,
-}
-
-
-fn extract_username_host(text: &str) -> Option<String> {
-    let re = Regex::new(r"ubuntu@[^ ]+").unwrap();
-
-    if let Some(cap) = re.find(text) {
-        Some(cap.as_str().to_string())
-    } else {
-        None
-    }
-}
 
 
 // #[tauri::command]
@@ -86,7 +64,7 @@ fn extract_username_host(text: &str) -> Option<String> {
 //         format!("Found nothing")
 //     }
 // }
-
+// 0Sh1g0t0! jays pc pass
 #[tauri::command]
 fn launch_cloud_client() -> String{
     

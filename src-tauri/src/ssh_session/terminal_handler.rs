@@ -1,4 +1,3 @@
-use core::fmt;
 use std::process::{Command, Output};
 use std::string::String;
 use std::error::Error;
@@ -23,20 +22,20 @@ impl std::fmt::Display for LaunchError {
 
 impl Error for LaunchError {}
 
-#[derive(Debug)]
-enum ConversionError{
-    Utf8Error(std::string::FromUtf8Error),
-}
+// #[derive(Debug)]
+// enum ConversionError{
+//     Utf8Error(std::string::FromUtf8Error),
+// }
 
-impl fmt::Display for ConversionError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ConversionError::Utf8Error(err) => write!(f, "UTF-8 conversion error: {}", err)
-        }
-    }
-}
+// impl fmt::Display for ConversionError {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             ConversionError::Utf8Error(err) => write!(f, "UTF-8 conversion error: {}", err)
+//         }
+//     }
+// }
 
-impl Error for ConversionError {}
+// impl Error for ConversionError {}
 
 
 fn run_command(command: &str, args: &[&str]) -> Result<Output, LaunchError>{
@@ -81,17 +80,6 @@ fn launch_machine_command() -> Result<Output, LaunchError>{
 }
 
 
-// fn extract_username_host(text: &str) -> Result<String> {
-//     let re = Regex::new(r"ubuntu@[^ ]+").unwrap();
-
-//     if let Some(cap) = re.find(text) {
-//         Some(cap.as_str().to_string())
-//     } else {
-//         None
-//     }
-// }
-
-
 fn extract_username_host(text: &str) -> Result<String, Box<dyn Error>> {
     let re = Regex::new(r"ubuntu@[^ ]+").map_err(|e| Box::new(e) as Box<dyn Error>)?;
 
@@ -103,18 +91,6 @@ fn extract_username_host(text: &str) -> Result<String, Box<dyn Error>> {
 }
 
 pub fn run_launch_machine() -> Result<String, Box<dyn Error>> {
-    
-    // match launch_machine_command() {
-    //     Ok(output) => {
-    //         let result = String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?;
-    //         let connection_string = extract_username_host(&result);
-    //         Ok(connection_string)
-    //     }
-    //     Err(err) => {
-    //         eprintln!("command execution failed with eerror : {}", err);
-    //         Err(Box::new(err))
-    //     }
-    // }
     let result = match launch_machine_command() {
         Ok(output) => {
             String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?
