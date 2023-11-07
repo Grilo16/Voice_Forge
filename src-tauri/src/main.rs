@@ -86,7 +86,8 @@ fn run_tmux_command(ssh_credentials: SshCredentials, run_flags: Vec<String>) -> 
     
     println!("{}", run_script_command);
     println!("{}", launch_flags);
-    
+    println!("{}", ssh_credentials);
+
     let mut ssh_session = match SshSession::new(&ssh_credentials) {
         Ok(ssh_session) =>  ssh_session, 
         Err(err) => return CommandResult { data: None, error: Some(err.to_string())}
