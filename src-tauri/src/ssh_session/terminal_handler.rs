@@ -54,41 +54,12 @@ fn launch_machine_command(launch_flags: String) -> Result<Output, LaunchError>{
         let mut mac_args = vec![
             "-c"
         ];
-        let mut mac_flags = "cd ~/spun/repos/su_cloud_scripts && python3 launch.py".to_string();
+        let mut mac_flags = "cd ~/spun/repos/su_cloud_scripts && python3 launch.py ".to_string();
         mac_flags.push_str(&launch_flags);
         mac_args.push(&mac_flags);
         run_command("sh",&mac_args)
     }
 }
-// fn launch_machine_command() -> Result<Output, LaunchError>{
-//     if cfg!(target_os = "windows") {
-//         run_command(
-//             "powershell",
-//             &[
-//                 "cd",
-//                 "~/spun/repos/su_cloud_scripts",
-//                 ";",
-//                 "python",
-//                 "launch.py",
-//                 "--machine",
-//                 "t2.small",
-//                 "--product",
-//                 "TTS_deploy",
-//                 "--names",
-//                 "s04vXu0Qv_repair",
-//             ],
-//         )
-//     } else {
-//         run_command(
-//             "sh",
-//             &[
-//                 "-c",
-//                 "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine t2.small --product TTS_deploy --name s04vXu0Qv_repair",
-//             ],
-//         )
-//     }
-// }
-
 
 fn extract_username_host(text: &str) -> Result<&str, Box<dyn Error>> {
     let re = Regex::new(r"ubuntu@[^ ]+").map_err(|e| Box::new(e) as Box<dyn Error>)?;

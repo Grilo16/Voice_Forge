@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
+import { pushArgs, selectArgs } from "../../features/reducers/machineReducer"
+import { pushTmuxArgs, selectTmuxArgs } from "../../features/reducers/tmuxReducer"
 
-export const FlagInput = ({label, flag, type, altFlags, required, setOutput }) => {
+export const FlagInput = ({label, flag, type, altFlags, required, setOutput, tmux }) => {
 
+    const args = tmux? useSelector(selectTmuxArgs) : useSelector(selectArgs)
     const [selectedFlag, setSelectedFlag] = useState({})
-  
     
     const [flagValue, setFlagValue] = useState("")
     const output = {
@@ -13,8 +16,10 @@ export const FlagInput = ({label, flag, type, altFlags, required, setOutput }) =
         type: type
     }
 
+    const dispatch = useDispatch()
+
     useEffect(() => {
-                setOutput(current => ({...current, [label]: {...output}}))
+        setOutput(current => ({...current, [label]: {...output}}))
     }, [flagValue])
 
 
@@ -25,15 +30,16 @@ export const FlagInput = ({label, flag, type, altFlags, required, setOutput }) =
             {altFlags.map(flag => <ToggleFlag onClick={()=>(setSelectedFlag(flag),altFlags.length ? flagValue === " " ?  setFlagValue(""): null : null)} selected={selectedFlag.label === flag.label? true: false}>{flag.label}</ToggleFlag>)}
             </div> 
         <StyledInput  type={selectedFlag.type ?? type} 
-                value={flagValue}
                 required={required} 
-                onChange={(e) => !selectedFlag.type 
-                        ? type === "checkbox" 
-                            ? setFlagValue(e.target.checked ? " " : "") 
-                            : setFlagValue(e.target.value)
-                        : selectedFlag.type === "checkbox"
-                        ? setFlagValue(e.target.checked ? " " : "") 
-                        : setFlagValue(e.target.value) } 
+                value={args[label]?.value}
+                onChange={(e)=>dispatch(tmux? pushTmuxArgs({label: label, flag: flag, output: e.target.value}) : pushArgs({label: label, flag: flag, output: e.target.value}))}
+                // onChange={(e) => !selectedFlag.type 
+                //         ? type === "checkbox" 
+                //             ? setFlagValue(e.target.checked ? " " : "") 
+                //             : setFlagValue(e.target.value)
+                //         : selectedFlag.type === "checkbox"
+                //         ? setFlagValue(e.target.checked ? " " : "") 
+                //         : setFlagValue(e.target.value) } 
                 />
         </StyledLabel>
     )

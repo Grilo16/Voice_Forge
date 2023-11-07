@@ -13,15 +13,6 @@ function App() {
   addPage(<page.BlendPage/>, "Blend", "/blend")
   const routes = makeRoutes(pages)
 
-  const [cwd, setCwd] = useState("");
-  async function getCwd() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setCwd(await invoke("get_cwd"));
-  }
-  useEffect(() => {
-    getCwd()
-  }, [])
-  
   return (
     <Router>
       <AppLayout pages={pages}>

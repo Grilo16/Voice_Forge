@@ -1,6 +1,7 @@
 import { useState } from "react";
 import reactLogo from "../assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
+import { MachineLauncher } from "../components";
 
 export const HomePage = () => {
     const [greetMsg, setGreetMsg] = useState("");
@@ -14,6 +15,7 @@ export const HomePage = () => {
     return (
       <div>
         <h1>Voice Forge</h1>
+        <MachineLauncher/>
       </div>
     )
 };

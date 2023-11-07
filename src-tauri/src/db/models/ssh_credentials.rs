@@ -1,9 +1,9 @@
 use regex::Regex;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use rusqlite::types::{FromSql, ValueRef, FromSqlError};
 use std::fmt;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SshCredentials {
     pub id: i64,
     pub username: String,

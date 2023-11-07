@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FlagInput } from "../../components";
+import { useSelector } from "react-redux";
+import { selectTmuxArgs } from "../../features/reducers/tmuxReducer";
+import { invoke } from "@tauri-apps/api";
+import { selectCredentials } from "../../features/reducers/machineReducer";
 
 export const RepairPage = () => {
     
+    const launchArgs = useSelector(selectTmuxArgs)
+    const credentials = useSelector(selectCredentials)
+    let argList = [] 
     const repairArgs = {
         i: {
             label: "Speaker Id",
@@ -77,11 +84,21 @@ export const RepairPage = () => {
     
     const [outputObj, setOutputObj] = useState({})
     
-    
     const newOutput = Object.entries(outputObj).reduce((acc, curr)=>  {
         const flag = curr.at(1).value.length > 1 ? curr.at(1).flag : ""
         const value = curr.at(1).type === "week" ? curr.at(1).value.replace("W", "") :curr.at(1).value
         return !value ? acc + " " : acc + flag + value}, "python3 ~/spun/repos/speedy/script/run.py ")
+        
+        const [tmuxCommandOutput, setTmuxCommandOutput] = useState([])
+        
+        
+        Object.entries(launchArgs).forEach(([_, {flag, value}]) => argList.push(flag, value))
+        const executeCommand = async () => {
+            setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
+        }
+        console.log(launchArgs)
+        console.log(credentials)
+        console.log(tmuxCommandOutput)
         
         return (
             <TaskSelectorDiv> 
@@ -95,9 +112,9 @@ export const RepairPage = () => {
 
                 <h3>Repair</h3>
                 <form style={{display: "flex", flexDirection: "column", gap: "1rem"}} action="">
-                    {Object.entries(repairArgs).map((obj) => <FlagInput {...obj.at(1)} setOutput={setOutputObj} />)}
-                    <button type="submit">Forge </button>
+                    {Object.entries(repairArgs).map((obj) => <FlagInput {...obj.at(1)} setOutput={setOutputObj} tmux={true} />)}
                 </form>
+                    <button onClick={() => executeCommand()}>Forge </button>
             </TaskSelectorDiv>
 
 
