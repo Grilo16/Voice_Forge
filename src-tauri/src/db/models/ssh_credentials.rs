@@ -1,6 +1,6 @@
 use regex::Regex;
 use serde::Serialize;
-use rusqlite::{types::{FromSql, ValueRef, FromSqlError}};
+use rusqlite::types::{FromSql, ValueRef, FromSqlError};
 use std::fmt;
 
 #[derive(Debug, Serialize)]

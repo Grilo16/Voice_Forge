@@ -1,9 +1,7 @@
 use core::fmt;
 
-use rusqlite::{types::{FromSql, ValueRef, FromSqlError}};
+use rusqlite::types::{FromSql, ValueRef, FromSqlError};
 use serde::Serialize;
-
-
 
 #[derive(Debug, Serialize)]
 pub struct Flag {
@@ -45,7 +43,6 @@ impl FromSql for Flag {
         let flag: String =  value.as_str()?.to_string();
         let input_type: String =  value.as_str()?.to_string();
         let required: bool = value.as_i64()? != 0;
-
 
         Ok(Flag {
             id,
