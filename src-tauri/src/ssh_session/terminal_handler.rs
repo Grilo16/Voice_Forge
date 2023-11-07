@@ -3,6 +3,8 @@ use std::process::{Command, Output};
 use std::string::String;
 use std::error::Error;
 
+use regex::Regex;
+
 
 #[derive(Debug)]
 enum LaunchError {
@@ -78,52 +80,51 @@ fn launch_machine_command() -> Result<Output, LaunchError>{
     }
 }
 
+
+// fn extract_username_host(text: &str) -> Result<String> {
+//     let re = Regex::new(r"ubuntu@[^ ]+").unwrap();
+
+//     if let Some(cap) = re.find(text) {
+//         Some(cap.as_str().to_string())
+//     } else {
+//         None
+//     }
+// }
+
+
+fn extract_username_host(text: &str) -> Result<String, Box<dyn Error>> {
+    let re = Regex::new(r"ubuntu@[^ ]+").map_err(|e| Box::new(e) as Box<dyn Error>)?;
+
+    if let Some(cap) = re.find(text) {
+        Ok(cap.as_str().to_string())
+    } else {
+        Err("Pattern not found in text".into())
+    }
+}
+
 pub fn run_launch_machine() -> Result<String, Box<dyn Error>> {
     
-    match launch_machine_command() {
+    // match launch_machine_command() {
+    //     Ok(output) => {
+    //         let result = String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?;
+    //         let connection_string = extract_username_host(&result);
+    //         Ok(connection_string)
+    //     }
+    //     Err(err) => {
+    //         eprintln!("command execution failed with eerror : {}", err);
+    //         Err(Box::new(err))
+    //     }
+    // }
+    let result = match launch_machine_command() {
         Ok(output) => {
-            let result = String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?;
-            Ok(result)
+            String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?
         }
         Err(err) => {
-            eprintln!("command execution failed with eerror : {}", err);
-            Err(Box::new(err))
+            eprintln!("Command execution failed with error: {}", err);
+            return Err(Box::new(err));
         }
+    };
 
-    }
-
-    // let output = if cfg!(target_os = "windows") {
-    //     Command::new("powershell")
-    //         .args(&[
-    //             "cd",
-    //             "~/spun/repos/su_cloud_scripts",   
-    //             ";",                              
-    //             "python launch.py",             
-    //             "--machine", "t2.small",
-    //             "--product", "TTS_deploy",
-    //             "--names", "s04vXu0Qv_repair"
-    //         ])
-    //         .output()
-    // } else {
-    //     Command::new("sh")
-    //     .args(&[
-    //         "-c",
-    //         "cd ~/spun/repos/su_cloud_scripts && python3 launch.py --machine t2.small --product TTS_deploy --name s04vXu0Qv_repair"
-    //     ])  
-    //         .output()
-    // }?;
-
-    // if output.status.success() {
-    //     let hello = String::from_utf8(output.stdout).map_err(|e| {
-    //         Error::new(ErrorKind::Other, format!("Error converting to string: {}", e))
-    //     })?;
-    //     Ok(hello.to_string())
-    // } else {
-    //     let stderr = String::from_utf8(output.stderr).map_err(|e| {
-    //         Error::new(ErrorKind::Other, format!("Error converting stderr to string: {}", e))
-    //     })?;
-    //     eprintln!("Command execution failed with error: {}", stderr);
-    //     Err(Error::new(ErrorKind::Other, "Command execution failed"))
-    // }
+    extract_username_host(&result)
 }
 
