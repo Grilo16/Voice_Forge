@@ -6,6 +6,7 @@ const tmuxReducer = createSlice({
 
     initialState: {
         args : {},
+        repairFlags: [],
     },
 
     reducers: {

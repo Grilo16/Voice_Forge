@@ -6,34 +6,34 @@ import { useSelector } from "react-redux";
 
 export const BuildPage = () => {
 
-    const launchArgs = useSelector(selectArgs)
-    const credentials = useSelector(selectCredentials)
+    // const launchArgs = useSelector(selectArgs)
+    // const credentials = useSelector(selectCredentials)
 
-    const [ssh, setSsh] = useState("")
-    const [launchOutput, setLaunchOutput] = useState("")
-    const [credentialList, setCredentialList] = useState([])
-    const [tmuxCommandOutput, setTmuxCommandOutput] = useState([])
-
-
-    let comand  = {comand: "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry "}
-    let query = {query: 2}
-
-    const launchClient = async () => {
-        setLaunchOutput(await invoke("launch_cloud_instance"))
-    }
-    const getCredentials = async () => {
-        setCredentialList(await invoke("get_ssh_credentials"))
-    }
+    // const [ssh, setSsh] = useState("")
+    // const [launchOutput, setLaunchOutput] = useState("")
+    // const [credentialList, setCredentialList] = useState([])
+    // const [tmuxCommandOutput, setTmuxCommandOutput] = useState([])
 
 
-    let argList = [] 
-    Object.entries(launchArgs).forEach(([_, {flag, value}]) => argList.push(flag, value))
+    // let comand  = {comand: "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry "}
+    // let query = {query: 2}
+
+    // const launchClient = async () => {
+    //     setLaunchOutput(await invoke("launch_cloud_instance"))
+    // }
+    // const getCredentials = async () => {
+    //     setCredentialList(await invoke("get_ssh_credentials"))
+    // }
 
 
-    const executeCommand = async () => {
-        setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
-    }
-    console.log(tmuxCommandOutput)
+    // let argList = [] 
+    // Object.entries(launchArgs).forEach(([_, {flag, value}]) => argList.push(flag, value))
+
+
+    // const executeCommand = async () => {
+    //     setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
+    // }
+    // console.log(tmuxCommandOutput)
 
     return (
         <>
@@ -41,7 +41,7 @@ export const BuildPage = () => {
         <button onClick={() => executeCommand()}>test command</button>
         {/* <button onClick={() => getCredentials()}>get credentials</button>
         <button onClick={() => getCredentials()}>get credentials</button> */}
-        <h1>{launchOutput}</h1>
+        {/* <h1>{launchOutput}</h1> */}
         </>
 
         

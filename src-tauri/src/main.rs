@@ -88,9 +88,6 @@ fn run_tmux_command(ssh_credentials: SshCredentials, run_flags: Vec<String>) -> 
     let mut run_script_command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py ".to_string();
     run_script_command.push_str(&launch_flags);
     
-    println!("{}", run_script_command);
-    println!("{}", launch_flags);
-    println!("{}", ssh_credentials);
     let mut ssh_session = match SshSession::new(&ssh_credentials) {
         Ok(ssh_session) =>  ssh_session, 
         Err(err) => return CommandResult { data: None, error: Some(err.to_string())}

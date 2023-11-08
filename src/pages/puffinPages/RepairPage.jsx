@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { FlagInput } from "../../components";
+import { FlagInput, StyledButton } from "../../components";
 import { useSelector } from "react-redux";
 import { selectTmuxArgs } from "../../features/reducers/tmuxReducer";
 import { invoke } from "@tauri-apps/api";
@@ -50,7 +50,8 @@ export const RepairPage = () => {
         prepoc: {
             label: "Preprocessing",
             flag: "--preproc",
-            type: "text",
+            type: "dropdown",
+            options: ["rnnoise", "postfish", "voicefixer", "rnnoise_postfish"],
             required: false,
             altFlags : [],
         }, 
@@ -76,8 +77,23 @@ export const RepairPage = () => {
         donorprepoc: {
             label: "Donor Preprocessing",
             flag: "--donorpreproc",
-            type: "select",// will be dropdown
+            type: "dropdown",
+            options: ["rnnoise", "postfish", "voicefixer", "rnnoise_postfish"],
             required: false,
+            altFlags : [],
+        }, 
+        sada: {
+            label: "Dry run",
+            flag: "--dry",
+            type: "checkbox",
+            required: true,
+            altFlags : [],
+        }, 
+        doaasdanorid: {
+            label: "Super dry run",
+            flag: "--superdry",
+            type: "checkbox",
+            required: true,
             altFlags : [],
         }, 
     }
@@ -96,9 +112,6 @@ export const RepairPage = () => {
         const executeCommand = async () => {
             setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
         }
-        console.log(launchArgs)
-        console.log(credentials)
-        console.log(tmuxCommandOutput)
         
         return (
             <TaskSelectorDiv> 
@@ -114,7 +127,7 @@ export const RepairPage = () => {
                 <form style={{display: "flex", flexDirection: "column", gap: "1rem"}} action="">
                     {Object.entries(repairArgs).map((obj) => <FlagInput {...obj.at(1)} setOutput={setOutputObj} tmux={true} />)}
                 </form>
-                    <button onClick={() => executeCommand()}>Forge </button>
+                    <StyledButton onClick={() => executeCommand()}>Forge </StyledButton>
             </TaskSelectorDiv>
 
 
