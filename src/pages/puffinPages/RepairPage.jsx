@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FlagInput, StyledButton } from "../../components";
 import { useSelector } from "react-redux";
-import { selectTmuxArgs } from "../../features/reducers/tmuxReducer";
-import { invoke } from "@tauri-apps/api";
-import { selectCredentials } from "../../features/reducers/machineReducer";
+import { selectRepairArgs } from "../../features/reducers/repairReducer";
+import { StringBuilder } from "../../components/flagInput/StringBuilder";
 
 export const RepairPage = () => {
     
-    const launchArgs = useSelector(selectTmuxArgs)
-    const credentials = useSelector(selectCredentials)
-    let argList = [] 
-    const repairArgs = {
+    const launchArgs = useSelector(selectRepairArgs)
+    const stateName = "repair"
+    const rustCommand = "run_tmux_command"
+    const pageName = "Repair"
+    const flagData = {
         i: {
             label: "Speaker Id",
             flag: "-i",
@@ -68,7 +65,8 @@ export const RepairPage = () => {
             type: "text",
             required: false,
             altFlags : [{
-                label: "donorvb",
+                label: "Donor Date",
+                altLabel: "donor vb",
                 flag: "--donorvb",
                 type: "checkbox",
                 required: false,
@@ -98,55 +96,13 @@ export const RepairPage = () => {
         }, 
     }
     
-    const [outputObj, setOutputObj] = useState({})
-    
-    const newOutput = Object.entries(outputObj).reduce((acc, curr)=>  {
-        const flag = curr.at(1).value.length > 1 ? curr.at(1).flag : ""
-        const value = curr.at(1).type === "week" ? curr.at(1).value.replace("W", "") :curr.at(1).value
-        return !value ? acc + " " : acc + flag + value}, "python3 ~/spun/repos/speedy/script/run.py ")
-        
-        const [tmuxCommandOutput, setTmuxCommandOutput] = useState([])
-        
-        
-        Object.entries(launchArgs).forEach(([_, {flag, value}]) => argList.push(flag, value))
-        const executeCommand = async () => {
-            setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
-        }
-        
-        return (
-            <TaskSelectorDiv> 
-            {/* <select>
-                <option> something </option>
-            </select> */}
-                <OutputDiv>
-                    <h1>Forged Command : </h1>
-                    <h2> {newOutput} </h2>
-                </OutputDiv>
-
-                <h3>Repair</h3>
-                <form style={{display: "flex", flexDirection: "column", gap: "1rem"}} action="">
-                    {Object.entries(repairArgs).map((obj) => <FlagInput {...obj.at(1)} setOutput={setOutputObj} tmux={true} />)}
-                </form>
-                    <StyledButton onClick={() => executeCommand()}>Forge </StyledButton>
-            </TaskSelectorDiv>
-
-
-// Launch => Go to path,
-// open script
-// Paste clipboard
+    return (
+        <StringBuilder launchArgs={launchArgs} stateName={stateName} rustCommand={rustCommand} pageName={pageName} flagData={flagData}/>
     )
-};
+}
 
-const TaskSelectorDiv = styled.div`
-display: grid;
-min-width: 50%;
-max-width: 50rem;
-grid-template-rows: 10rem auto;
-`
 
-const OutputDiv = styled.div`
-border: 1px solid grey;
-`
+
 
 
 

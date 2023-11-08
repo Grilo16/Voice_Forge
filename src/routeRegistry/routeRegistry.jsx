@@ -2,7 +2,7 @@ import { Route } from "react-router-dom";
 
 export const pages = {};
 
-export const addPage = (element, label, path, folder=false) => {
+export const addPage = (element, label, path, folder="false") => {
     const newPage = {
         element : element,
         label : label,

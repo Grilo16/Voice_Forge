@@ -5,8 +5,8 @@ import { DisplayInstanceStatus } from "./displayInstanceStatus";
 export const NavBar = ({pages}) => {
     const pageLinks = Object.values(pages).map(({label, path, folder}, index) =>  
         <Link style={{textDecoration: "none", color: "white"}} to={path} key={index}>
-            <NavItemDiv folder={folder} >
-                <NavItemLabel folder={folder}>
+            <NavItemDiv $folder={folder} >
+                <NavItemLabel $folder={folder}>
                     {label}
                 </NavItemLabel>
             </NavItemDiv>
@@ -22,12 +22,12 @@ export const NavBar = ({pages}) => {
 
 
 const NavItemLabel = styled.p`
-margin-left: ${({folder}) => folder ? "2rem" : "3rem" };
-font-weight: ${({folder}) => folder ? "bold": null};
+margin-left: ${({$folder}) =>  $folder === "true" ? "2rem" : "3rem" };
+font-weight: ${({$folder}) =>  $folder === "true" ? "bold": null};
 `
 
 const NavItemDiv = styled.div`
-background: ${({folder}) => folder ? "#777879" : "#676869"};
+background: ${({$folder}) => $folder === "true" ? "#777879" : "#676869"};
 min-height: 2rem;
 min-width: 12rem;
 display: flex;
@@ -35,7 +35,7 @@ align-items: center;
 justify-content: left;
 transition: all 0.2s;
 &:hover { 
-    background: ${({folder}) => folder ? "#575859" : "#474849"};
+    background: ${({$folder}) =>  $folder === "true" ? "#575859" : "#474849"};
 
 }
 

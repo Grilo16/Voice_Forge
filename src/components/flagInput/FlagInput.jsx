@@ -6,47 +6,74 @@ import {
   pushTmuxArgs,
   selectTmuxArgs,
 } from "../../features/reducers/tmuxReducer";
+import { pushBuildArgs, selectBuildArgs } from "../../features/reducers/buildReducer";
+import { pushBlendArgs, selectBlendArgs } from "../../features/reducers/blendReducer";
+import { pushRepairArgs, selectRepairArgs } from "../../features/reducers/repairReducer";
 
-export const FlagInput = ({
-  label,
-  flag,
-  type,
-  altFlags,
-  required,
-  setOutput,
-  tmux,
-  options,
-}) => {
-  const args = tmux ? useSelector(selectTmuxArgs) : useSelector(selectArgs);
-  const [selectedFlag, setSelectedFlag] = useState({});
+export const FlagInput = ({label,  flag,  type,  altFlags,  required,  options, stateName,}) => {
+    
+    
+    const dispatch = useDispatch();
+    const [selectedFlag, setSelectedFlag] = useState({label: "", flag: "", type: "",});
+    // const pushToState = tmux ? pushTmuxArgs : pushArgs
+    const pushToState = stateName === "build" 
+                        ? pushBuildArgs 
+                        : stateName === "blend"
+                        ? pushBlendArgs
+                        : stateName === "repair"
+                        ? pushRepairArgs
+                        : pushArgs
+    // const args = tmux ? useSelector(selectTmuxArgs) : useSelector(selectArgs);
+    const args = stateName === "build" 
+                ? useSelector(selectBuildArgs) 
+                : stateName === "blend"
+                ? useSelector(selectBlendArgs)
+                : stateName === "repair"
+                ? useSelector(selectRepairArgs)
+                : useSelector(selectArgs)
 
-  const [flagValue, setFlagValue] = useState("");
-  const output = {
-    flag: `${selectedFlag.flag ?? flag} `,
-    value: `${flagValue} `,
-    type: type,
-  };
+    let argValue = ""; 
 
-  const dispatch = useDispatch();
+    console.log(stateName)
 
-  useEffect(() => {
-    setOutput((current) => ({ ...current, [label]: { ...output } }));
-  }, [flagValue]);
+    useEffect(() => {
+        if (stateName && !args[selectedFlag[label]]?.flag === ""){
+            console.log("here")
+            dispatch(pushToState({label: label, flag: flag, output: ""}))
+        }
+        setSelectedFlag({label : label, flag: flag, type: type, required: required, options: options})
+    }, [])
 
-  if (type === "dropdown") {
-    const displayOptions = options?.map((option) => (
-      <StyledOption>{option}</StyledOption>
+    if (stateName) {
+        argValue = args[selectedFlag.label]?.value ?? ""
+    } else {
+        argValue = args[flag]
+    }
+
+    const altFlagsSelectors = (
+        altFlags.map((flag, index) => (
+            <ToggleFlag key={index} onClick={()=>setSelectedFlag({...flag})} selected >
+                {flag.altLabel}
+            </ToggleFlag>
+        ))
+    )
+
+  
+  if (selectedFlag.type === "dropdown") {
+   
+    const displayOptions = selectedFlag.options?.map((option, index) => (
+      <StyledOption key={index}>{option}</StyledOption>
     ));
-
 
     return (
       <StyledLabel>
         <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <ToggleFlag selected>
+          <ToggleFlag onClick={()=> altFlags.length ? (setSelectedFlag({label : label, flag: flag, type: type, required: required, options: options}), dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: ""}))) : null} selected>
             {label}
           </ToggleFlag>
+          {altFlagsSelectors}
         </div>
-        <StyledSelect onChange={(e) => dispatch(pushArgs({ flag: flag, output: e.target.value }))}>
+        <StyledSelect onChange={(e) => dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: e.target.value}))}>
         <StyledOption></StyledOption>
             {displayOptions}
         </StyledSelect>
@@ -54,61 +81,39 @@ export const FlagInput = ({
     );
   }
 
+  if (selectedFlag.type === "checkbox") {
+    return (
+        <StyledLabel>
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <ToggleFlag  onClick={()=> altFlags.length ? (setSelectedFlag({label : label, flag: flag, type: type, required: required, options: options}), dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: ""}))) : null} selected>
+            {label}
+            </ToggleFlag>
+          {altFlagsSelectors}
+        </div>
+        <StyledInput
+          type={selectedFlag.type}
+          required={selectedFlag?.required}
+          checked={argValue}
+          onChange={(e) => (dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: e.target.checked ? " " : ""})))}
+          />
+      </StyledLabel>
+    )
+  }
+
   return (
     <StyledLabel>
       <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-        <ToggleFlag
-          onClick={() => (
-            setSelectedFlag({}),
-            altFlags.length
-              ? flagValue === " "
-                ? setFlagValue("")
-                : null
-              : null
-          )}
-          selected={selectedFlag.label ? false : true}
-        >
+        <ToggleFlag onClick={()=> altFlags.length ? (setSelectedFlag({label : label, flag: flag, type: type, required: required, options: options}), dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: ""}))) : null} selected>
           {label}
-        </ToggleFlag>
-        {altFlags.map((flag) => (
-          <ToggleFlag
-            onClick={() => (
-              setSelectedFlag(flag),
-              altFlags.length
-                ? flagValue === " "
-                  ? setFlagValue("")
-                  : null
-                : null
-            )}
-            selected={selectedFlag.label === flag.label ? true : false}
-          >
-            {flag.label}
           </ToggleFlag>
-        ))}
+          {altFlagsSelectors}
       </div>
       <StyledInput
-        type={selectedFlag.type ?? type}
-        required={required}
-        value={args[label]?.value}
-        onChange={(e) =>
-          dispatch(
-            tmux
-              ? pushTmuxArgs({
-                  label: label,
-                  flag: flag,
-                  output: e.target.value,
-                })
-              : pushArgs({ flag: flag, output: e.target.value })
-          )
-        }
-        // onChange={(e) => !selectedFlag.type
-        //         ? type === "checkbox"
-        //             ? setFlagValue(e.target.checked ? " " : "")
-        //             : setFlagValue(e.target.value)
-        //         : selectedFlag.type === "checkbox"
-        //         ? setFlagValue(e.target.checked ? " " : "")
-        //         : setFlagValue(e.target.value) }
-      />
+        type={selectedFlag.type}
+        required={selectedFlag?.required}
+        value={argValue}
+        onChange={(e) => dispatch(pushToState({label: selectedFlag.label, flag: selectedFlag.flag, output: e.target.value}))}
+        />
     </StyledLabel>
   );
 };
@@ -138,4 +143,6 @@ const ToggleFlag = styled.div`
   justify-content: center;
 `;
 
-const StyledInput = styled.input``;
+const StyledInput = styled.input`
+text-align: center;
+`;

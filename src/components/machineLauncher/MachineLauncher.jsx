@@ -50,7 +50,7 @@ export const MachineLauncher = () => {
     };
     return (
         <InputDiv>
-            {Object.entries(repairArgs).map((obj) => <FlagInput {...obj.at(1)} setOutput={setOutputObj} />)}
+            {Object.entries(repairArgs).map((obj, index) => <FlagInput key={index} {...obj.at(1)} setOutput={setOutputObj} />)}
             <StyledButton onClick={() => launchInstance()}>Launch Instance</StyledButton>
         </InputDiv>
     )

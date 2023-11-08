@@ -1,49 +1,102 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { invoke } from "@tauri-apps/api";
-import { selectArgs, selectCredentials } from "../../features/reducers/machineReducer";
 import { useSelector } from "react-redux";
+import { selectBuildArgs } from "../../features/reducers/buildReducer";
+import { StringBuilder } from "../../components/flagInput/StringBuilder";
 
 export const BuildPage = () => {
 
-    // const launchArgs = useSelector(selectArgs)
-    // const credentials = useSelector(selectCredentials)
-
-    // const [ssh, setSsh] = useState("")
-    // const [launchOutput, setLaunchOutput] = useState("")
-    // const [credentialList, setCredentialList] = useState([])
-    // const [tmuxCommandOutput, setTmuxCommandOutput] = useState([])
-
-
-    // let comand  = {comand: "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry "}
-    // let query = {query: 2}
-
-    // const launchClient = async () => {
-    //     setLaunchOutput(await invoke("launch_cloud_instance"))
-    // }
-    // const getCredentials = async () => {
-    //     setCredentialList(await invoke("get_ssh_credentials"))
-    // }
-
-
-    // let argList = [] 
-    // Object.entries(launchArgs).forEach(([_, {flag, value}]) => argList.push(flag, value))
-
-
-    // const executeCommand = async () => {
-    //     setTmuxCommandOutput(await invoke("run_tmux_command", {sshCredentials: credentials, runFlags: argList}))
-    // }
-    // console.log(tmuxCommandOutput)
-
+    const launchArgs = useSelector(selectBuildArgs)
+    const stateName = "build"
+    const rustCommand = "run_tmux_command"
+    const pageName = "Build"
+    const flagData = {
+        i: {
+            label: "Speaker Id",
+            flag: "-i",
+            type: "text",
+            required: true,
+            altFlags : [],
+        }, 
+        d: {
+            label: "Date (YYYY-WW)",
+            flag: "-d",
+            type: "text",
+            required: true,
+            altFlags : [],
+        }, 
+        n: {
+            label: "Starting Version",
+            flag: "-n",
+            type: "text",
+            required: true,
+            altFlags : [],
+        }, 
+        vb: {
+            label: "vb",
+            flag: "--vb",
+            type: "checkbox",
+            required: false,
+            altFlags : [],
+        }, 
+        accent: {
+            label: "Accent",
+            flag: "--accent",
+            type: "text",
+            required: false,
+            altFlags : [],
+        }, 
+        prepoc: {
+            label: "Preprocessing",
+            flag: "--preproc",
+            type: "dropdown",
+            options: ["rnnoise", "postfish", "voicefixer", "rnnoise_postfish"],
+            required: false,
+            altFlags : [],
+        }, 
+        donorid: {
+            label: "Donor Id",
+            flag: "--donorid",
+            type: "text",
+            required: true,
+            altFlags : [],
+        }, 
+        donordate: {
+            label: "Donor Date",
+            flag: "--donordate",
+            type: "text",
+            required: false,
+            altFlags : [{
+                label: "Donor Date",
+                altLabel: "donor vb",
+                flag: "--donorvb",
+                type: "checkbox",
+                required: false,
+            },],
+        }, 
+        donorprepoc: {
+            label: "Donor Preprocessing",
+            flag: "--donorpreproc",
+            type: "dropdown",
+            options: ["rnnoise", "postfish", "voicefixer", "rnnoise_postfish"],
+            required: false,
+            altFlags : [],
+        }, 
+        sada: {
+            label: "Dry run",
+            flag: "--dry",
+            type: "checkbox",
+            required: true,
+            altFlags : [],
+        }, 
+        doaasdanorid: {
+            label: "Super dry run",
+            flag: "--superdry",
+            type: "checkbox",
+            required: true,
+            altFlags : [],
+        }, 
+    }
+    
     return (
-        <>
-        <h1>i'm the Build Page</h1>
-        <button onClick={() => executeCommand()}>test command</button>
-        {/* <button onClick={() => getCredentials()}>get credentials</button>
-        <button onClick={() => getCredentials()}>get credentials</button> */}
-        {/* <h1>{launchOutput}</h1> */}
-        </>
-
-        
+        <StringBuilder launchArgs={launchArgs} stateName={stateName} rustCommand={rustCommand} pageName={pageName} flagData={flagData}/>
     )
-    };
+}

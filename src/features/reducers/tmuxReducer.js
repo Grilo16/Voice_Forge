@@ -6,7 +6,6 @@ const tmuxReducer = createSlice({
 
     initialState: {
         args : {},
-        repairFlags: [],
     },
 
     reducers: {
@@ -21,3 +20,7 @@ export default tmuxReducer.reducer;
 export const {pushTmuxArgs} = tmuxReducer.actions;
 
 export const selectTmuxArgs = (state) => state.tmux.args
+
+
+
+// python3 ~/spun/repos/speedy/script/run.py --donorvb -i asdfasdf -d asfasf -n sadfasdf --accent sadfasdf --vb --donorpreproc voicefixer --dry --donorid asfasf --preproc postfish --superdry

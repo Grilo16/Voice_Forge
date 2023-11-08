@@ -6,9 +6,9 @@ const machineReducer = createSlice({
 
     initialState: {
         args : {
-            machine: null,
-            product: null,
-            name: null,
+            machine: "",
+            product: "",
+            name: "",
         },
         sshCredentials : {
             id: null,

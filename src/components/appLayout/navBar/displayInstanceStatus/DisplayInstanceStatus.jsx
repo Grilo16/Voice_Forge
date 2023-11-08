@@ -10,7 +10,6 @@ export const DisplayInstanceStatus = () => {
     const sshInstances = useSelector(selectAllInstances)
 
     const dispatch = useDispatch()
-    console.log(credentials)
     const getAllInstances = async () => {
         const allInstances = await invoke("get_ssh_credentials");
         dispatch(setAllInstances(allInstances.data))
@@ -20,7 +19,7 @@ export const DisplayInstanceStatus = () => {
         getAllInstances()
     }, [])
 
-    const instanceOptions = sshInstances?.map((instance) => <StyledOption value={instance.id}>{instance.job_name}</StyledOption>)
+    const instanceOptions = sshInstances?.map((instance, index) => <StyledOption key={index} value={instance.id}>{instance.job_name}</StyledOption>)
     const data = {
         jobName: "s04vXu0Qv_repair",
         machineType:"t2.small",
