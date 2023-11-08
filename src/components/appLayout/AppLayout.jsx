@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { NavBar } from "./NavBar";
+import { NavBar } from "./navBar";
 
 export const AppLayout = ({pages, children}) => {
     return (
@@ -20,9 +20,8 @@ const PageContainerDiv = styled.div`
 display: grid;
 
 min-height: 100vh;
-max-height: 100vh;
 grid-template-rows: 4rem 1fr;
-grid-template-columns: 12rem 1fr;
+grid-template-columns: 14rem 1fr;
 grid-template-areas: 
     "nav header"
     "nav content"

@@ -28,6 +28,9 @@ impl Database {
                 id INTEGER PRIMARY KEY,
                 username TEXT,
                 host TEXT,
+                job_name TEXT,
+                machine_type TEXT,
+                product TEXT,
                 ssh_command TEXT
             )",
             [],

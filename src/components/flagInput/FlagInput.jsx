@@ -32,7 +32,7 @@ export const FlagInput = ({label, flag, type, altFlags, required, setOutput, tmu
         <StyledInput  type={selectedFlag.type ?? type} 
                 required={required} 
                 value={args[label]?.value}
-                onChange={(e)=>dispatch(tmux? pushTmuxArgs({label: label, flag: flag, output: e.target.value}) : pushArgs({label: label, flag: flag, output: e.target.value}))}
+                onChange={(e)=>dispatch(tmux? pushTmuxArgs({label: label, flag: flag, output: e.target.value}) : pushArgs({flag: flag, output: e.target.value}))}
                 // onChange={(e) => !selectedFlag.type 
                 //         ? type === "checkbox" 
                 //             ? setFlagValue(e.target.checked ? " " : "") 

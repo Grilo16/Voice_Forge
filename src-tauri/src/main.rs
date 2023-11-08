@@ -33,6 +33,7 @@ struct CommandResult<T> {
     error: Option<String>,
 }
 
+
 #[tauri::command]
 fn get_ssh_credentials() -> CommandResult<Vec<SshCredentials>> {
     let credentials_repo = SshCredentialsRepo::new();
@@ -45,12 +46,15 @@ fn get_ssh_credentials() -> CommandResult<Vec<SshCredentials>> {
 // 0Sh1g0t0! jays pc pass
 #[tauri::command]
 fn launch_cloud_instance() -> String {
-    
-    let launch_flags = "--machine t2.small --product TTS_deploy --name s04vXu0Qv_repair".to_string();
+// fn launch_cloud_instance(machine: String, product: String, name: String) -> String {
+    let machine = "t2.small".to_string();
+    let product = "TTS_deploy".to_string();
+    let name = "s04vXu0Qv_repair".to_string();
+    let launch_flags = format!("--machine {} --product {} --name {}", machine, product, name);
     
     let run_command = "tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py -i Asfas -d 2021-14 -n 99 --accent London --donorid Anything --donorvb --dry".to_string();
 
-    let ssh_credentials = match run_launch_machine(launch_flags) {
+    let ssh_credentials = match run_launch_machine(launch_flags, machine, product, name) {
         Ok(output) => output,
         Err(err) => return format!("Error: {}", err),
     };
@@ -68,9 +72,9 @@ fn launch_cloud_instance() -> String {
 
 
 #[tauri::command]
-fn launch_instance(instance_flags: Vec<String>) -> CommandResult<SshCredentials> {
-    let launch_flags = instance_flags.join(" ");
-    let ssh_credentials = match run_launch_machine(launch_flags) {
+fn launch_instance(machine: String, product: String, name: String) -> CommandResult<SshCredentials> {
+    let launch_flags = format!("--machine {} --product {} --name {}", machine, product, name);
+    let ssh_credentials = match run_launch_machine(launch_flags, machine, product, name) {
         Ok(output) => CommandResult { data: Some(output), error: None}, 
         Err(err) => CommandResult { data: None, error: Some(err.to_string())}
     };

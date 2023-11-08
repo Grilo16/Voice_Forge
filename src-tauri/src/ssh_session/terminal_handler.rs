@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::process::{Command, Output};
 use std::string::String;
 use std::error::Error;
@@ -72,7 +73,7 @@ fn extract_username_host(text: &str) -> Result<&str, Box<dyn Error>> {
 }
 
 
-pub fn run_launch_machine(launch_flags: String) -> Result<SshCredentials, Box<dyn Error>> {
+pub fn run_launch_machine(launch_flags: String, machine: String, product: String, name: String) -> Result<SshCredentials, Box<dyn Error>> {
     let result = match launch_machine_command(launch_flags) {
         Ok(output) => {
             String::from_utf8(output.stdout).map_err(|e| LaunchError::ConversionError(Box::new(e)))?
@@ -85,7 +86,7 @@ pub fn run_launch_machine(launch_flags: String) -> Result<SshCredentials, Box<dy
     
     let username_host = extract_username_host(&result)?;
 
-    match SshCredentials::from_ssh_string(&username_host) {
+    match SshCredentials::from_ssh_string(&username_host, &name, &machine, &product) {
         Some(credentials) => {
             let ssh_cred_repo = SshCredentialsRepo::new();
             let _ = ssh_cred_repo.insert_ssh_credentials(&credentials);

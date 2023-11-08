@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { DisplayInstanceStatus } from "./displayInstanceStatus";
 
 export const NavBar = ({pages}) => {
     const pageLinks = Object.values(pages).map(({label, path, folder}, index) =>  
@@ -14,6 +15,7 @@ export const NavBar = ({pages}) => {
     return (
         <NavDiv>
             {pageLinks}
+            <DisplayInstanceStatus/>
         </NavDiv>
     )
 };
@@ -36,6 +38,7 @@ transition: all 0.2s;
     background: ${({folder}) => folder ? "#575859" : "#474849"};
 
 }
+
 `
 
 
@@ -44,5 +47,5 @@ background-color: #373839;
 grid-area: nav;
 display: flex;
 flex-direction: column;
-align-items: center;
+align-content: flex-start;
 `

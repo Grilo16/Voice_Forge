@@ -14,9 +14,9 @@ impl SshCredentialsRepo {
 
     pub fn insert_ssh_credentials(&self, credentials: &SshCredentials) -> Result<(), Error> {
         self.conn.execute(
-            "INSERT INTO ssh_credentials (username, host, ssh_command)
-             VALUES (?1, ?2, ?3)",
-            params![&credentials.username, &credentials.host, &credentials.ssh_command],
+            "INSERT INTO ssh_credentials (username, host, job_name, machine_type, product, ssh_command)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            params![&credentials.username, &credentials.host, &credentials.job_name, &credentials.machine_type, &credentials.product, &credentials.ssh_command],
         )?;
         Ok(())
     }
@@ -28,7 +28,10 @@ impl SshCredentialsRepo {
                 id: row.get(0)?,
                 username: row.get(1)?,
                 host: row.get(2)?,
-                ssh_command: row.get(3)?,
+                job_name: row.get(3)?,
+                machine_type: row.get(4)?,
+                product: row.get(5)?,
+                ssh_command: row.get(6)?,
             })
         });
 
@@ -46,7 +49,10 @@ impl SshCredentialsRepo {
                 id: row.get(0)?,
                 username: row.get(1)?,
                 host: row.get(2)?,
-                ssh_command: row.get(3)?,
+                job_name: row.get(3)?,
+                machine_type: row.get(4)?,
+                product: row.get(5)?,
+                ssh_command: row.get(6)?,
             })
         })?;
 
@@ -69,9 +75,9 @@ impl SshCredentialsRepo {
     pub fn update_ssh_credentials(&self, credentials: &SshCredentials) -> Result<(), Error> {
         self.conn.execute(
             "UPDATE ssh_credentials
-             SET username = ?2, host = ?3, ssh_command = ?4
+             SET username = ?2, host = ?3, job_name = ?4, machine_type = ?5, product = ?6, ssh_command = ?7
              WHERE id = ?1",
-            params![credentials.id, &credentials.username, &credentials.host, &credentials.ssh_command],
+            params![credentials.id, &credentials.username, &credentials.host, &credentials.job_name, &credentials.machine_type, &credentials.product, &credentials.ssh_command],
         )?;
         Ok(())
     }
