@@ -4,6 +4,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { FlagInput } from "./FlagInput";
 import { StyledButton } from "../machineLauncher";
+import { invoke } from "@tauri-apps/api";
 
 export const StringBuilder = ({pageName, launchArgs, stateName, rustCommand, flagData}) => {
     

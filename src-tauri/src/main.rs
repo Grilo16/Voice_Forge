@@ -85,9 +85,9 @@ fn launch_instance(machine: String, product: String, name: String) -> CommandRes
 fn run_tmux_command(ssh_credentials: SshCredentials, run_flags: Vec<String>) -> CommandResult<String> {
     let launch_flags = run_flags.join(" ");
 
-    let mut run_script_command = "touch out.txt; tmux new-session -d -s my_session; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py ".to_string();
+    let mut run_script_command = "touch out.txt; tmux new-session -d -s my_session; source ~/.profile; source ~/puffin_env/bin/activate; python3 ~/spun/repos/speedy/script/run.py ".to_string();
     run_script_command.push_str(&launch_flags);
-    let write_to_txt = "|& tee -a out.txt".to_string();
+    let write_to_txt = " |& tee -a out.txt".to_string();
     run_script_command.push_str(&write_to_txt);
 
 

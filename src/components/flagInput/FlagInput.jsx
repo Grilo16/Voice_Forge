@@ -122,7 +122,6 @@ const StyledSelect = styled.select`
   border-radius: 5px;
   align-self: stretch;
   min-height: 2rem;
-  min-width: 100%;
 `;
 const StyledOption = styled.option`
   text-align: center;
