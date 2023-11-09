@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { pushArgs, selectArgs } from "../../features/reducers/machineReducer";
-import {
-  pushTmuxArgs,
-  selectTmuxArgs,
-} from "../../features/reducers/tmuxReducer";
 import { pushBuildArgs, selectBuildArgs } from "../../features/reducers/buildReducer";
 import { pushBlendArgs, selectBlendArgs } from "../../features/reducers/blendReducer";
 import { pushRepairArgs, selectRepairArgs } from "../../features/reducers/repairReducer";
@@ -15,7 +11,6 @@ export const FlagInput = ({label,  flag,  type,  altFlags,  required,  options, 
     
     const dispatch = useDispatch();
     const [selectedFlag, setSelectedFlag] = useState({label: "", flag: "", type: "",});
-    // const pushToState = tmux ? pushTmuxArgs : pushArgs
     const pushToState = stateName === "build" 
                         ? pushBuildArgs 
                         : stateName === "blend"
@@ -23,7 +18,6 @@ export const FlagInput = ({label,  flag,  type,  altFlags,  required,  options, 
                         : stateName === "repair"
                         ? pushRepairArgs
                         : pushArgs
-    // const args = tmux ? useSelector(selectTmuxArgs) : useSelector(selectArgs);
     const args = stateName === "build" 
                 ? useSelector(selectBuildArgs) 
                 : stateName === "blend"
@@ -34,11 +28,9 @@ export const FlagInput = ({label,  flag,  type,  altFlags,  required,  options, 
 
     let argValue = ""; 
 
-    console.log(stateName)
 
     useEffect(() => {
         if (stateName && !args[selectedFlag[label]]?.flag === ""){
-            console.log("here")
             dispatch(pushToState({label: label, flag: flag, output: ""}))
         }
         setSelectedFlag({label : label, flag: flag, type: type, required: required, options: options})
